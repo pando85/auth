@@ -1,7 +1,7 @@
 from inspect import iscoroutinefunction
 from typing import Any, Callable, TypeVar
 
-from __MY_APP__.typing import Maybe, Error
+from auth.typing import Maybe, Error
 
 T = TypeVar('T')
 

@@ -2,7 +2,7 @@ import logging
 from typing import TypeVar
 import sys
 
-from __MY_APP__.config import LOG_LEVEL
+from auth.config import LOG_LEVEL
 
 T = TypeVar('T')
 

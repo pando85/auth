@@ -1,6 +1,6 @@
 import pytest
 
-from __MY_APP__.app import get_app
+from auth.app import get_app
 
 
 @pytest.fixture

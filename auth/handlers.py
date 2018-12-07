@@ -1,11 +1,11 @@
 from aiohttp.web import Request, Response, json_response
 
-from __MY_APP__ import logger
-from __MY_APP__.db import create_user
-from __MY_APP__.functools import compose
-from __MY_APP__.token import create_token
-from __MY_APP__.typing import Maybe, Error, Success
-from __MY_APP__.verify import check_password
+from auth import logger
+from auth.db import create_user
+from auth.functools import compose
+from auth.token import create_token
+from auth.typing import Maybe, Error, Success
+from auth.verify import check_password
 
 
 async def auth_handler(request: Request) -> Response:

@@ -1,8 +1,8 @@
 from functools import partial
 
-from __MY_APP__.user import User
-from __MY_APP__.typing import Maybe, Success
-from __MY_APP__.functools import bind
+from auth.user import User
+from auth.typing import Maybe, Success
+from auth.functools import bind
 
 
 def _create_token(user: User) -> Maybe[Success]:

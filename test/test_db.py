@@ -3,8 +3,8 @@ import passlib
 
 from asyncpg import _testbase as tb
 
-from __MY_APP__.db import USERS_TABLE_NAME, init_db, _create_user, _get_user
-from __MY_APP__.user import User
+from auth.db import USERS_TABLE_NAME, init_db, _create_user, _get_user
+from auth.user import User
 
 
 async def count_rows(con: asyncpg.connect, table: str):

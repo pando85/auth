@@ -1,8 +1,8 @@
 from aiohttp.web import Request, Response
 
-from __MY_APP__.functools import compose
-from __MY_APP__ import logger
-from __MY_APP__ import response
+from auth.functools import compose
+from auth import logger
+from auth import response
 
 
 async def ping_handler(request: Request) -> Response:

@@ -1,6 +1,6 @@
 .PHONY: help requirements requirements_test lint test run destroy_db init_db destroy_mq init_mq
 
-APP := __MY_APP__
+APP := auth
 WORKON_HOME ?= .venv
 VENV_BASE := $(WORKON_HOME)/$(APP)
 VENV_ACTIVATE := $(VENV_BASE)/bin/activate
@@ -54,6 +54,7 @@ init_db: destroy_db
 	@while ! docker exec postgres psql --host=localhost --username=test -c 'SELECT 1' &> /dev/null; do \
 	 	echo 'Waiting for postgres...'; \
 	 	sleep 1; \
+	done;
 
 destroy_mq:    ## destroy docker mq
 	@echo Destroy rabbit

@@ -1,9 +1,9 @@
 import aiohttp
 import passlib
 
-from __MY_APP__.db import get_user
-from __MY_APP__.user import User
-from __MY_APP__.typing import Maybe, Error
+from auth.db import get_user
+from auth.user import User
+from auth.typing import Maybe, Error
 
 
 async def check_password(request: aiohttp.web.Request) -> Maybe[User]:

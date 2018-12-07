@@ -2,11 +2,11 @@ import aiohttp
 import asyncpg
 import passlib.hash
 
-from __MY_APP__.config import (ADMIN_USER, ADMIN_PASSWORD, POSTGRES_HOST, POSTGRES_PORT,
-                               POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
-from __MY_APP__ import logger
-from __MY_APP__.user import User, to_dict
-from __MY_APP__.typing import Maybe, Error, Success
+from auth.config import (ADMIN_USER, ADMIN_PASSWORD, POSTGRES_HOST, POSTGRES_PORT,
+                         POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
+from auth import logger
+from auth.user import User, to_dict
+from auth.typing import Maybe, Error, Success
 
 USERS_TABLE_NAME = 'users'
 

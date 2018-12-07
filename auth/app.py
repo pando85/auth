@@ -1,9 +1,9 @@
 import aiohttp.web
 
-from __MY_APP__.db import setup_db
-from __MY_APP__.handlers import auth_handler, create_user_handler
-from __MY_APP__.ping import ping_handler
-from __MY_APP__.mq import init_rabbit_client
+from auth.db import setup_db
+from auth.handlers import auth_handler, create_user_handler
+from auth.ping import ping_handler
+from auth.mq import init_rabbit_client
 
 
 def get_app() -> aiohttp.web.Application:

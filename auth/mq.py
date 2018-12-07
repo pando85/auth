@@ -2,7 +2,7 @@ import aiohttp
 
 from aio_pika import connect_robust, DeliveryMode, IncomingMessage, Message
 
-from __MY_APP__.config import RABBIT_HOST, RABBIT_USER, RABBIT_PASSWORD
+from auth.config import RABBIT_HOST, RABBIT_USER, RABBIT_PASSWORD
 
 
 async def send_message(channel, message_body):

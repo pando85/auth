@@ -1,6 +1,6 @@
 [run]
 branch = True
-include = ./__MY_APP__/*
+include = ./auth/*
 
 [report]
 exclude_lines =

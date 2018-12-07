@@ -1,7 +1,7 @@
 import aiohttp.web
 
-from __MY_APP__.app import get_app
-from __MY_APP__.logger import access_logger
+from auth.app import get_app
+from auth.logger import access_logger
 
 
 def main():
