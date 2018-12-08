@@ -30,7 +30,6 @@ jobs:
     - stage: "update-dependencies"
       install:
         - pip install -r requirements_test.txt
-        - bash scripts/update_dependencies.sh
       before_script:
         # Disable services enabled by default
         - sudo service rabbitmq-server stop
