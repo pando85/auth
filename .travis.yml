@@ -47,6 +47,6 @@ jobs:
     - stage: dockerhub-build
       install: skip
       script:
-        - "curl -H 'Content-Type: application/json' --data '{\"build\": true}' -X POST https://registry.hub.docker.com/u/$TRAVIS_REPO_SLUG/trigger/$DOCKERHUB_TOKEN/"
+        - "curl -H 'Content-Type: application/json' --data '{\"build\": true}' -X POST https://registry.hub.docker.com/u/pando85/auth/trigger/$DOCKERHUB_TOKEN/"
       env:
         - secure: "L66xRr5d7XbfGHrE6r05MDwioSX+KGNSP7JE39n9TE5A7nTCBc1w9Aou29925QC5d9sO3N3PKxzdZ5r9LnPaPFsj5O/7ldNEu+urYQ1pSJcx80fGw5ed8er7qypqiCtXV9gnxqwFWfkp4PAhe3LW2n4XDJRnUjJuERyQJ8/oturJFOmGZadryWORKrncmz7sb/oheYdYjPuLDrpVTc11jsFyH9c9KlpaXinK6Tvgd5Ln8A5q41kCfAD+i8MBm930+osfUD+BqU6RrtMaS1kC5cMeKHyINnX40oqKPnrCxbcVwXMTMxf9WJml5tNLP0iS6ebLYQNgIcZxQqP6QWVasvQiSVZRtvRLcb3OkEhIdKyeP35AQZnXU2f6XgZ5qjuYJqW2eY7LIAtvCUEtUydHVLxsCL8GZOjtulcV2MsOzcGJgde9O4VIOV48cPutOqr0NQPqD4WwUBYB21fKITuIxnIrfgeh8M7yq+aJ5lQZvtVxCK3kSqJ068mEeNnmXoyVagOYciOE2MPPPTY4s/F+VIS0cL88Vr/DnTw7/c/0AW587ldlFbCnbFWk2WGcncE5gMqbONIM4YmAbLUmFRk7qc/crP4YKu5cwkXKxjvKAbFwB805OV0R36bGpIwLxhNx3xvvRFXO1aajuAd1Eo80JQFSR0T8k4jTOXf6q8E1OIo="
