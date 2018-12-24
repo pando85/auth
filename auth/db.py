@@ -1,26 +1,18 @@
-import aiohttp
 import asyncpg
 import passlib.hash
 
-from auth.config import (ADMIN_USER, ADMIN_PASSWORD, POSTGRES_HOST, POSTGRES_PORT,
-                         POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
-from auth import logger
-from auth.user import User, to_dict
-from auth.typing import Maybe, Error, Success
+from aiohttp.web import Request
+from aiolambda import logger
+from aiolambda.db import _check_table_exists
+from aiolambda.errors import ObjectAlreadyExists, ObjectNotFound
+from aiolambda.functools import Maybe
+from toolz import curry
+from typing import Callable
+
+from auth.config import ADMIN_USER, ADMIN_PASSWORD
+from auth.user import User
 
 USERS_TABLE_NAME = 'users'
-
-
-async def _check_table_exists(conn: asyncpg.connect, table: str) -> bool:
-    r = await conn.fetchrow(f'''
-        SELECT EXISTS (
-            SELECT 1
-            FROM   pg_tables
-            WHERE  schemaname = 'public'
-            AND    tablename = $1
-            );
-    ''', table)
-    return r['exists']
 
 
 async def _create_user(conn: asyncpg.connect, user: User) -> Maybe[User]:
@@ -29,24 +21,8 @@ async def _create_user(conn: asyncpg.connect, user: User) -> Maybe[User]:
             INSERT INTO {USERS_TABLE_NAME}(username, password) VALUES($1, $2)
         ''', user.username, passlib.hash.pbkdf2_sha256.hash(user.password))
     except asyncpg.exceptions.UniqueViolationError:
-        return Error("'user already exists'", 409)
+        return ObjectAlreadyExists()
     return user
-
-
-async def _update_user(conn: asyncpg.connect, user: User) -> Maybe[User]:
-    await conn.execute(f'''
-        UPDATE {USERS_TABLE_NAME} SET password = $2 WHERE username = $1
-    ''', user.username, passlib.hash.pbkdf2_sha256.hash(user.password))
-    return user
-
-
-async def _get_user(conn: asyncpg.connection, username: str) -> Maybe[User]:
-    row = await conn.fetchrow(
-        f'SELECT * FROM {USERS_TABLE_NAME} WHERE username = $1', username)
-
-    if not row:
-        return Error("'user does not exists'", 422)
-    return User(**dict(row))
 
 
 async def init_db(conn: asyncpg.connect) -> None:
@@ -66,35 +42,34 @@ async def init_db(conn: asyncpg.connect) -> None:
     await _create_user(conn, User(ADMIN_USER, ADMIN_PASSWORD))
 
 
-async def setup_db(app: aiohttp.web.Application) -> None:
-    app['pool'] = await asyncpg.create_pool(
-        host=POSTGRES_HOST,
-        port=POSTGRES_PORT,
-        database=POSTGRES_DB,
-        user=POSTGRES_USER,
-        password=POSTGRES_PASSWORD)
-    async with app['pool'].acquire() as connection:
-        await init_db(connection)
-
-
-async def create_user(request: aiohttp.web.Request) -> Maybe[Success]:
+@curry
+async def _operate_user(operation: Callable, request: Request) -> Maybe[User]:
     pool = request.app['pool']
     user_request = User(**(await request.json()))
 
     async with pool.acquire() as connection:
-        maybe_user = await _create_user(connection, user_request)
-        if isinstance(maybe_user, User):
-            return Success(to_dict(maybe_user), 201)
-        maybe_user = await _update_user(connection, user_request)
-        if isinstance(maybe_user, User):
-            return Success(to_dict(maybe_user), 200)
+        maybe_user = await operation(connection, user_request)
     return maybe_user
 
 
-async def get_user(request: aiohttp.web.Request) -> Maybe[User]:
-    pool = request.app['pool']
-    user_request = User(**(await request.json()))
+@_operate_user
+async def create_user(conn: asyncpg.connect, user: User) -> Maybe[User]:
+    return await _create_user(conn, user)
 
-    async with pool.acquire() as connection:
-        user = await _get_user(connection, user_request.username)
+
+@_operate_user
+async def update_user(conn: asyncpg.connect, user: User) -> Maybe[User]:
+    await conn.execute(f'''
+        UPDATE {USERS_TABLE_NAME} SET password = $2 WHERE username = $1
+    ''', user.username, passlib.hash.pbkdf2_sha256.hash(user.password))
     return user
+
+
+@_operate_user
+async def get_user(conn: asyncpg.connection, user: User) -> Maybe[User]:
+    row = await conn.fetchrow(
+        f'SELECT * FROM {USERS_TABLE_NAME} WHERE username = $1', user.username)
+
+    if not row:
+        return ObjectNotFound()
+    return User(**dict(row))
