@@ -164,32 +164,28 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/ObjectNotFound'
-
-#  /password:
-#    post:
-#      security:
-#      - oauth2:
-#         - user
-#         - admin
-#      tags:
-#      - "password"
-#      summary: "Update password"
-#      description: ""
-#      operationId: "auth.handlers.update_password_handler"
-#      parameters:
-#      - in: "body"
-#        name: "body"
-#        description: "Created user object"
-#        required: true
-#        schema:
-#          $ref: "#/components/schemas/User"
-#      responses:
-#        '204':
-#          description: "successful operation"
-#        '401':
-#          $ref: '#/components/responses/UnauthorizedError'
-#        '404':
-#          $ref: '#/components/responses/ObjectNotFound'
+  /password:
+    post:
+      security:
+      - oauth2: []
+      tags:
+      - "password"
+      summary: "Update password"
+      description: ""
+      operationId: "auth.handlers.update_password_handler"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New password"
+        required: true
+        schema:
+          type: "string"
+          example: password1234
+      responses:
+        '204':
+          description: "successful operation"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /ping:
     get:
       tags:
