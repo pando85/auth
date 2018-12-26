@@ -120,6 +120,13 @@ async def test_delete_user_not_exists(cli):
     assert resp.status == 404
 
 
+async def test_update_password(cli):
+    token = await get_token(cli)
+    auth_header = {'Authorization': f'Bearer {token}'}
+    resp = await cli.post(f'{BASE_URL}/password', json='admin2', headers=auth_header)
+    assert resp.status == 204
+
+
 async def test_ping(cli):
     resp = await cli.get(f'{BASE_URL}/ping')
     assert resp.status == 200

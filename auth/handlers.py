@@ -2,7 +2,7 @@ from aiohttp.web import Response
 from aiolambda import logger
 from aiolambda.functools import compose
 
-from auth.db import create_user, delete_user, get_user, update_user
+from auth.db import create_user, delete_user, get_user, update_user, update_password
 from auth.response import return_200, return_201, return_204
 from auth.token import generate_token
 from auth.user import to_dict
@@ -50,6 +50,13 @@ async def delete_user_handler(username, **extra_args) -> Response:
         to_dict,
         return_204
     )(extra_args['request'], username)
+
+
+async def update_password_handler(*_null, **extra_args) -> Response:
+    return await compose(
+        update_password,
+        return_204
+    )(extra_args['request'])
 
 
 async def ping_handler() -> Response:

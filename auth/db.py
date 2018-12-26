@@ -91,3 +91,17 @@ async def get_user(conn: asyncpg.connection, user: User) -> Maybe[User]:
     if not row:
         return ObjectNotFound()
     return User(**dict(row))
+
+
+async def update_password(request: Maybe[Request]) -> Maybe[User]:
+    pool = request.app['pool']
+    username = request['user']
+    password = await request.json()
+
+    async with pool.acquire() as connection:
+        res = await connection.execute(f'''
+            UPDATE {USERS_TABLE_NAME} SET password = $2 WHERE username = $1
+        ''', username, passlib.hash.pbkdf2_sha256.hash(password))
+    if res != 'UPDATE 1':
+        return Exception()
+    return password
