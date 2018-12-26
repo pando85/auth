@@ -7,7 +7,7 @@ from aiolambda.db import _check_table_exists
 from aiolambda.errors import ObjectAlreadyExists, ObjectNotFound
 from aiolambda.functools import Maybe
 from toolz import curry
-from typing import Callable
+from typing import Callable, Optional
 
 from auth.config import ADMIN_USER, ADMIN_PASSWORD
 from auth.user import User
@@ -44,9 +44,16 @@ async def init_db(conn: asyncpg.connect) -> None:
 
 
 @curry
-async def _operate_user(operation: Callable, request: Request) -> Maybe[User]:
+async def _operate_user(operation: Callable,
+                        request: Maybe[Request],
+                        username: Optional[str] = None) -> Maybe[User]:
+    if isinstance(request, Exception):
+        return request
     pool = request.app['pool']
-    user_request = User(**(await request.json()))
+    if username:
+        user_request = User(username=username, password='undefined')
+    else:
+        user_request = User(**(await request.json()))
 
     async with pool.acquire() as connection:
         maybe_user = await operation(connection, user_request)
@@ -63,6 +70,16 @@ async def update_user(conn: asyncpg.connect, user: User) -> Maybe[User]:
     await conn.execute(f'''
         UPDATE {USERS_TABLE_NAME} SET password = $2, scope = $3 WHERE username = $1
     ''', user.username, passlib.hash.pbkdf2_sha256.hash(user.password), user.scope)
+    return user
+
+
+@_operate_user
+async def delete_user(conn: asyncpg.connect, user: User) -> Maybe[User]:
+    res = await conn.execute(f'''
+        DELETE FROM {USERS_TABLE_NAME} WHERE username = $1
+    ''', user.username)
+    if res == 'DELETE 0':
+        return ObjectNotFound()
     return user
 
 

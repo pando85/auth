@@ -29,8 +29,8 @@ async def test_auth(cli):
 
 async def test_auth_incorret_user(cli):
     resp = await cli.post(f'{BASE_URL}/auth', json={'username': 'foo', 'password': 'foo'})
-    assert resp.status == 422
-    assert await resp.json() == 'Invalid credentials'
+    assert resp.status == 404
+    assert await resp.json() == 'Object not found'
 
 
 async def test_auth_incorret_password(cli):
@@ -73,6 +73,50 @@ async def test_user_add_body_validation(cli):
     user = {'username': 'boo'}
     resp = await cli.post(f'{BASE_URL}/user', json=user, headers=auth_header)
     assert resp.status == 400
+
+
+async def test_get_user(cli):
+    token = await get_token(cli)
+    auth_header = {'Authorization': f'Bearer {token}'}
+    user = {'username': 'admin', 'password': 'admin', 'scope': 'admin'}
+    resp = await cli.get(f'{BASE_URL}/user/{user["username"]}', headers=auth_header)
+    assert resp.status == 200
+    response_user = await resp.json()
+    assert response_user.keys() == user.keys()
+    assert response_user['username'] == user['username']
+
+
+async def test_update_user(cli):
+    token = await get_token(cli)
+    auth_header = {'Authorization': f'Bearer {token}'}
+    user = {'username': 'admin', 'password': 'admin', 'scope': 'admin'}
+    resp = await cli.put(f'{BASE_URL}/user/{user["username"]}', json=user, headers=auth_header)
+    assert resp.status == 204
+
+
+async def test_update_user_fail_username_check(cli):
+    token = await get_token(cli)
+    auth_header = {'Authorization': f'Bearer {token}'}
+    user = {'username': 'admin', 'password': 'admin', 'scope': 'admin'}
+    resp = await cli.put(f'{BASE_URL}/user/{user["username"]}2', json=user, headers=auth_header)
+    assert resp.status == 422
+    assert await resp.json() == 'Id in body and url params does not match'
+
+
+async def test_delete_user(cli):
+    token = await get_token(cli)
+    auth_header = {'Authorization': f'Bearer {token}'}
+    username = 'test2'
+    resp = await cli.delete(f'{BASE_URL}/user/{username}', headers=auth_header)
+    assert resp.status == 204
+
+
+async def test_delete_user_not_exists(cli):
+    token = await get_token(cli)
+    auth_header = {'Authorization': f'Bearer {token}'}
+    username = 'test22323'
+    resp = await cli.delete(f'{BASE_URL}/user/{username}', headers=auth_header)
+    assert resp.status == 404
 
 
 async def test_ping(cli):
